@@ -25,12 +25,12 @@ export class MorningcodeBasicCdkStack extends cdk.Stack {
         {
           cidrMask: 24,
           name: 'SubnetPri1',
-          subnetType: SubnetType.PRIVATE_ISOLATED,
+          subnetType: SubnetType.PRIVATE_WITH_NAT,
         },
         {
           cidrMask: 24,
           name: 'SubnetPri2',
-          subnetType: SubnetType.PRIVATE_ISOLATED,
+          subnetType: SubnetType.PRIVATE_WITH_NAT,
         },
       ]
     });
