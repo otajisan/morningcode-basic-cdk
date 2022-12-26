@@ -1,39 +1,94 @@
-import * as cdk from '@aws-cdk/core';
-import {Tags} from "@aws-cdk/core";
-import {SubnetType, Vpc} from "@aws-cdk/aws-ec2";
+import { Stack, StackProps, Tags } from 'aws-cdk-lib';
+import { Construct } from 'constructs';
+import {
+  CfnEIP,
+  CfnInternetGateway,
+  CfnNatGateway,
+  CfnVPCGatewayAttachment, IpAddresses,
+  RouterType,
+  Subnet,
+  Vpc,
+} from 'aws-cdk-lib/aws-ec2';
 
-export class MorningcodeBasicCdkStack extends cdk.Stack {
-  constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
+export class MorningcodeBasicCdkStack extends Stack {
+  constructor(scope: Construct, id: string, props?: StackProps) {
     super(scope, id, props);
 
     const vpc = new Vpc(this, 'Vpc', {
       vpcName: 'morningcode-main-vpc',
       maxAzs: 2,
-      cidr: '192.168.0.0/16',
-      natGateways: 1,
-      subnetConfiguration: [
-        {
-          cidrMask: 24,
-          name: 'SubnetPub1',
-          subnetType: SubnetType.PUBLIC,
-        },
-        {
-          cidrMask: 24,
-          name: 'SubnetPub2',
-          subnetType: SubnetType.PUBLIC,
-        },
-        {
-          cidrMask: 24,
-          name: 'SubnetPri1',
-          subnetType: SubnetType.PRIVATE_WITH_NAT,
-        },
-        {
-          cidrMask: 24,
-          name: 'SubnetPri2',
-          subnetType: SubnetType.PRIVATE_WITH_NAT,
-        },
-      ]
+      ipAddresses: IpAddresses.cidr('192.168.0.0/16'),
+      subnetConfiguration: []
     });
+
+    // Public Subnets
+    const publicSubnet1 = new Subnet(this, 'PublicSubnet1a', {
+      availabilityZone: 'ap-northeast-1a',
+      vpcId: vpc.vpcId,
+      cidrBlock: '192.168.0.0/24',
+    });
+
+    // const publicSubnet2 = new Subnet(this, 'PublicSubnet1c', {
+    //   availabilityZone: 'ap-northeast-1c',
+    //   vpcId: vpc.vpcId,
+    //   cidrBlock: '192.168.1.0/24',
+    // });
+
+    // Private Subnets
+    const privateSubnet1 = new Subnet(this, 'PrivateSubnet1a', {
+      availabilityZone: 'ap-northeast-1a',
+      vpcId: vpc.vpcId,
+      cidrBlock: '192.168.10.0/24',
+    });
+
+    // const privateSubnet2 = new Subnet(this, 'PrivateSubnet1c', {
+    //   availabilityZone: 'ap-northeast-1c',
+    //   vpcId: vpc.vpcId,
+    //   cidrBlock: '192.168.11.0/24',
+    // });
+
+    // Internet Gateway
+    const internetGateway = new CfnInternetGateway(this, 'InternetGateway', {});
+
+    // Add route to Public Subnets
+    // NOTE: to access Public Subnets from the external
+    new CfnVPCGatewayAttachment(this, 'gateway', {
+      vpcId: vpc.vpcId,
+      internetGatewayId: internetGateway.ref,
+    });
+
+    publicSubnet1.addRoute('PublicSubnetRoute', {
+      routerType: RouterType.GATEWAY,
+      routerId: internetGateway.ref,
+    });
+
+    // publicSubnet2.addRoute('PublicSubnetRoute', {
+    //   routerType: RouterType.GATEWAY,
+    //   routerId: internetGateway.ref,
+    // });
+
+    // EIP for NAT Gateway
+    const eip1 = new CfnEIP(this, 'ElasticIP1', {});
+    //const eip2 = new CfnEIP(this, 'ElasticIP2', {});
+
+    // NAT Gateway
+    const natGateway1 = new CfnNatGateway(this, 'NatGateway1', {
+      allocationId: eip1.attrAllocationId,
+      subnetId: publicSubnet1.subnetId,
+    });
+    // const natGateway2 = new CfnNatGateway(this, 'NatGateway2', {
+    //   allocationId: eip2.attrAllocationId,
+    //   subnetId: publicSubnet2.subnetId,
+    // });
+
+    privateSubnet1.addRoute('PrivateSubnetRoute1', {
+      routerType: RouterType.NAT_GATEWAY,
+      routerId: natGateway1.ref,
+    });
+    // privateSubnet2.addRoute('PrivateSubnetRoute2', {
+    //   routerType: RouterType.NAT_GATEWAY,
+    //   routerId: natGateway2.ref,
+    // });
 
     Tags.of(this).add('ServiceName', 'morningcode');
   }
