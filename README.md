@@ -1,14 +1,9 @@
 # Welcome to your CDK TypeScript project!
 
-This is a blank project for TypeScript development with CDK.
+[![CircleCI](https://dl.circleci.com/status-badge/img/gh/otajisan/morningcode-basic-cdk/tree/main.svg?style=svg)](https://dl.circleci.com/status-badge/redirect/gh/otajisan/morningcode-basic-cdk/tree/main)
+[![codecov](https://codecov.io/gh/otajisan/morningcode-basic-cdk/branch/main/graph/badge.svg?token=4O12EDLC9A)](https://codecov.io/gh/otajisan/morningcode-basic-cdk)
 
-The `cdk.json` file tells the CDK Toolkit how to execute your app.
-
-## Useful commands
-
- * `npm run build`   compile typescript to js
- * `npm run watch`   watch for changes and compile
- * `npm run test`    perform the jest unit tests
- * `cdk deploy`      deploy this stack to your default AWS account/region
- * `cdk diff`        compare deployed stack with current state
- * `cdk synth`       emits the synthesized CloudFormation template
+```bash
+npx cdk diff --profile morning-code-dev BackEndStack
+npx cdk deploy --profile morning-code-dev BackEndStack
+```
