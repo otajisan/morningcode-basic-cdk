@@ -132,27 +132,28 @@ commands:
               ]
             }
 
+
 jobs:
-  build-and-test-cdk:
+  build-and-test-cdk: 
     executor:
       name: node/default
-  steps:
-    - checkout
-    - node/with-cache:
-        steps:
-          - run:
-              name: Install npm packages
-              command: npm i
+    steps:
+      - checkout
+      - node/with-cache:
+          steps:
+            - run:
+                name: Install npm packages
+                command: npm i
 
-          - run:
-              name: Run npm test
-              command: npm run test
+            - run:
+                name: Run npm test
+                command: npm run test
 
-          - codecov/upload:
-              file: ./coverage/lcov.info
+            - codecov/upload:
+                file: ./coverage/lcov.info
 
-          - slack-notify-pass
-          - slack-notify-fail
+            - slack-notify-pass
+            - slack-notify-fail
 
 workflows:
   build-and-test-cdk:
