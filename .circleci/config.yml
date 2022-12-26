@@ -1,0 +1,159 @@
+version: 2.1
+
+# Enable dynamic config using setup workflows
+setup: true
+
+orbs:
+  slack: circleci/slack@4.9.3
+  codecov: codecov/codecov@3.2.4
+
+commands:
+  # Slack notification commands
+  slack-notify-pass:
+    steps:
+      - slack/notify:
+          event: pass
+          custom: |
+            {
+              "blocks": [
+                {
+                  "type": "header",
+                  "text": {
+                    "type": "plain_text",
+                    "text": ":circleci_pass: CircleCI Build Succeeded: $CIRCLE_PROJECT_REPONAME\nGo it! :sushi:",
+                    "emoji": true
+                  }
+                },
+                {
+                  "type": "section",
+                  "fields": [
+                    {
+                      "type": "mrkdwn",
+                      "text": "*Job*: $CIRCLE_JOB"
+                    },
+                    {
+                      "type": "mrkdwn",
+                      "text": "*Build number*: << pipeline.number >>"
+                    },
+                    {
+                      "type": "mrkdwn",
+                      "text": "*Author*: $CIRCLE_USERNAME"
+                    },
+                    {
+                      "type": "mrkdwn",
+                      "text": "*Branch*: <https://github.com/otajisan/aws-app-mesh-cognito-auth-example/tree/$CIRCLE_BRANCH|$CIRCLE_BRANCH>"
+                    },
+                    {
+                      "type": "mrkdwn",
+                      "text": "*PR*: $CIRCLE_PULL_REQUEST"
+                    },
+                    {
+                      "type": "mrkdwn",
+                      "text": "*Commit*: <https://github.com/otajisan/aws-app-mesh-cognito-auth-example/commit/<< pipeline.git.revision >>|<< pipeline.git.revision >>>"
+                    }
+                  ]
+                },
+                {
+                  "type": "actions",
+                  "elements": [
+                    {
+                      "type": "button",
+                      "text": {
+                        "type": "plain_text",
+                        "text": ":circleci: View Job",
+                        "emoji": true
+                      },
+                      "url": "$CIRCLE_BUILD_URL"
+                    }
+                  ]
+                }
+              ]
+            }
+
+  slack-notify-fail:
+    steps:
+      - slack/notify:
+          event: fail
+          custom: |
+            {
+              "blocks": [
+                {
+                  "type": "header",
+                  "text": {
+                    "type": "plain_text",
+                    "text": ":circleci_fail: CircleCI Build Failed: $CIRCLE_PROJECT_REPONAME\nplease check :pray:",
+                    "emoji": true
+                  }
+                },
+                {
+                  "type": "section",
+                  "fields": [
+                    {
+                      "type": "mrkdwn",
+                      "text": "*Job*: $CIRCLE_JOB"
+                    },
+                    {
+                      "type": "mrkdwn",
+                      "text": "*Build number*: << pipeline.number >>"
+                    },
+                    {
+                      "type": "mrkdwn",
+                      "text": "*Author*: $CIRCLE_USERNAME"
+                    },
+                    {
+                      "type": "mrkdwn",
+                      "text": "*Branch*: <https://github.com/otajisan/aws-app-mesh-cognito-auth-example/tree/$CIRCLE_BRANCH|$CIRCLE_BRANCH>"
+                    },
+                    {
+                      "type": "mrkdwn",
+                      "text": "*PR*: $CIRCLE_PULL_REQUEST"
+                    },
+                    {
+                      "type": "mrkdwn",
+                      "text": "*Commit*: <https://github.com/otajisan/aws-app-mesh-cognito-auth-example/commit/<< pipeline.git.revision >>|<< pipeline.git.revision >>>"
+                    }
+                  ]
+                },
+                {
+                  "type": "actions",
+                  "elements": [
+                    {
+                      "type": "button",
+                      "text": {
+                        "type": "plain_text",
+                        "text": ":circleci: View Job",
+                        "emoji": true
+                      },
+                      "url": "$CIRCLE_BUILD_URL"
+                    }
+                  ]
+                }
+              ]
+            }
+
+jobs:
+  build-and-test-cdk:
+    executor:
+      name: node/default
+  steps:
+    - checkout
+    - node/with-cache:
+        steps:
+          - run:
+              name: Install npm packages
+              command: npm i
+
+          - run:
+              name: Run npm test
+              command: npm run test
+
+          - codecov/upload:
+              file: ./coverage/lcov.info
+
+          - slack-notify-pass
+          - slack-notify-fail
+
+workflows:
+  build-and-test-cdk:
+    jobs:
+      - build-and-test-cdk
