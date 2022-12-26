@@ -139,21 +139,19 @@ jobs:
       name: node/default
     steps:
       - checkout
-      - node/with-cache:
-          steps:
-            - run:
-                name: Install npm packages
-                command: npm i
+      - run: sudo npm install -g npm@latest
+      - node/install-packages:
+          cache-path: ~/project/node_modules
+          override-ci-command: npm install
+      - run:
+          name: Run npm test
+          command: npm run test
 
-            - run:
-                name: Run npm test
-                command: npm run test
+      - codecov/upload:
+          file: ./coverage/lcov.info
 
-            - codecov/upload:
-                file: ./coverage/lcov.info
-
-            - slack-notify-pass
-            - slack-notify-fail
+      - slack-notify-pass
+      - slack-notify-fail
 
 workflows:
   build-and-test-cdk:
