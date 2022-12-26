@@ -4,5 +4,7 @@ module.exports = {
   testMatch: ['**/*.test.ts'],
   transform: {
     '^.+\\.tsx?$': 'ts-jest'
-  }
+  },
+  coverageDirectory: './coverage/',
+  collectCoverage: true
 };
