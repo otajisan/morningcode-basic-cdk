@@ -1,5 +1,5 @@
-import { Stack, StackProps, Tags } from 'aws-cdk-lib';
-import { Construct } from 'constructs';
+import {Stack, StackProps, Tags} from 'aws-cdk-lib';
+import {Construct} from 'constructs';
 import {
   CfnEIP,
   CfnInternetGateway,
@@ -28,11 +28,11 @@ export class MorningcodeBasicCdkStack extends Stack {
       cidrBlock: '192.168.0.0/24',
     });
 
-    // const publicSubnet2 = new Subnet(this, 'PublicSubnet1c', {
-    //   availabilityZone: 'ap-northeast-1c',
-    //   vpcId: vpc.vpcId,
-    //   cidrBlock: '192.168.1.0/24',
-    // });
+    const publicSubnet2 = new Subnet(this, 'PublicSubnet1c', {
+      availabilityZone: 'ap-northeast-1c',
+      vpcId: vpc.vpcId,
+      cidrBlock: '192.168.1.0/24',
+    });
 
     // Private Subnets
     const privateSubnet1 = new Subnet(this, 'PrivateSubnet1a', {
@@ -41,11 +41,11 @@ export class MorningcodeBasicCdkStack extends Stack {
       cidrBlock: '192.168.10.0/24',
     });
 
-    // const privateSubnet2 = new Subnet(this, 'PrivateSubnet1c', {
-    //   availabilityZone: 'ap-northeast-1c',
-    //   vpcId: vpc.vpcId,
-    //   cidrBlock: '192.168.11.0/24',
-    // });
+    const privateSubnet2 = new Subnet(this, 'PrivateSubnet1c', {
+      availabilityZone: 'ap-northeast-1c',
+      vpcId: vpc.vpcId,
+      cidrBlock: '192.168.11.0/24',
+    });
 
     // Internet Gateway
     const internetGateway = new CfnInternetGateway(this, 'InternetGateway', {});
@@ -62,10 +62,10 @@ export class MorningcodeBasicCdkStack extends Stack {
       routerId: internetGateway.ref,
     });
 
-    // publicSubnet2.addRoute('PublicSubnetRoute', {
-    //   routerType: RouterType.GATEWAY,
-    //   routerId: internetGateway.ref,
-    // });
+    publicSubnet2.addRoute('PublicSubnetRoute', {
+      routerType: RouterType.GATEWAY,
+      routerId: internetGateway.ref,
+    });
 
     // EIP for NAT Gateway
     const eip1 = new CfnEIP(this, 'ElasticIP1', {});

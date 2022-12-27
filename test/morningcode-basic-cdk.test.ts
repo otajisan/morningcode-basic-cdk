@@ -43,7 +43,7 @@ describe('correct resources are created', () => {
   test('Subnets are created', () => {
     const template = Template.fromStack(synthStack());
 
-    template.resourceCountIs('AWS::EC2::Subnet', 2);
+    template.resourceCountIs('AWS::EC2::Subnet', 4);
     template.hasResourceProperties('AWS::EC2::Subnet', {
       VpcId: { Ref: vpcId },
       AvailabilityZone: 'ap-northeast-1a',

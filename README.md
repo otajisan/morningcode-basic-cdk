@@ -4,6 +4,6 @@
 [![codecov](https://codecov.io/gh/otajisan/morningcode-basic-cdk/branch/main/graph/badge.svg?token=4O12EDLC9A)](https://codecov.io/gh/otajisan/morningcode-basic-cdk)
 
 ```bash
-npx cdk diff --profile morning-code-dev BackEndStack
-npx cdk deploy --profile morning-code-dev BackEndStack
+npx cdk diff --profile morning-code-dev MorningcodeBasicCdkStack
+npx cdk deploy --profile morning-code-dev MorningcodeBasicCdkStack
 ```
